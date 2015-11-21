@@ -3,8 +3,9 @@
 
 typedef struct Trie 
 { 
-	char *value;
+	//char *value;
 	char ch;
+	int  count;
 	struct trie *sibling; /* Sibling node */
 	struct trie *child; /* First child node */
 } Trie; 
@@ -17,19 +18,20 @@ Trie* trie_create()
 	if ( (node = malloc(sizeof(*node))) == NULL)
 		return NULL;
 	node->ch = '\0';
-	node->value = NULL;
+	//node->value = NULL;
+	node->count = 0;
 	node->sibling = NULL;
 	node->child = NULL;
 	return node;
 }
 
 //Поиск узла в Trie по ключу
+/*
 char *trie_lookup(Trie *root, char *key)
 {
 	Trie *node, *list;
 	for (list = root; *key != '\0'; key++) {
-		for (node = list; node != NULL;
-			node = node->sibling)
+		for (node = list; node != NULL; node = node->sibling)
 		{
 			if (node->ch == *key)
 			break;
@@ -39,21 +41,23 @@ char *trie_lookup(Trie *root, char *key)
 	else
 		return NULL;
 	}
-/* Check: Node must be a leaf node! */
-	return node->value;
-}
+		/* Check: Node must be a leaf node! */
+/*	return node->value;
+}*/
 
 //Вставка узла в Trie
-Trie *trie_insert(Trie *root, char *key, char *value)
+Trie *trie_insert(Trie *root, char *key)
 {
 	Trie *node, *parent, *list;
 	parent = NULL;
 	list = root;
 	for (; *key != '\0'; key++) {
 	/* Lookup sibling node */
-		for (node = list; node != NULL;
-			node = node->sibling)
-		{
+		for (node = list; node != NULL; node = node->sibling)
+		{	
+			if (node->ch == 'c')
+				printf("%c %s\n", node->ch, key);
+			node->count++;
 			if (node->ch == *key)
 				break;
 		}
@@ -61,6 +65,7 @@ Trie *trie_insert(Trie *root, char *key, char *value)
 	/* Node not found. Add new node */
 			node = trie_create();
 			node->ch = *key;
+			node->count = 1;
 			node->sibling = list;
 			if (parent != NULL)
 				parent->child = node;
@@ -73,10 +78,12 @@ Trie *trie_insert(Trie *root, char *key, char *value)
 		}
 		parent = node;
 	}
+
 	/* Update value in leaf */
+	/*
 	if (node->value != NULL)
 		free(node->value);
-		node->value = strdup(value);
+		node->value = strdup(value);*/
 		return root;
 } 
 
@@ -105,7 +112,7 @@ Trie *trie_delete_dfs(Trie *root, Trie *parent, char *key, int *found)
 			else
 				root = node->sibling;
 		}
-		free(node->value);
+	//	free(node->value);
 		free(node);
 	}
 	return root;
@@ -125,10 +132,10 @@ void trie_print(Trie *root, int level)
 	{
 		for (i = 0; i < level; i++)
 			printf(" ");
-		if (node->value != NULL)
-			printf("%c (%s)\n", node->ch, node->value);
-		else
-			printf("%c \n", node->ch);
+		/*if (node->value != NULL)
+			printf("%c %d \n", node->ch, node->count);
+		else*/
+			printf("%c %d \n", node->ch, node->count);
 		if (node->child != NULL)
 			trie_print(node->child, level + 1);
 	}
@@ -138,14 +145,20 @@ void trie_print(Trie *root, int level)
 int main()
 {
 	Trie *root = NULL;
-	root = trie_insert(NULL, "bars", "60");
+	root = trie_insert(NULL, "abcdef");
+	root = trie_insert(root, "abcjff");
+	root = trie_insert(root, "abkjff");
+	root = trie_insert(root, "abkjff");
+	//root = trie_insert(root, "abcdm", "3");
 	//root = trie_insert(root, "baribal", "100");
 	//root = trie_insert(root, "kit", "3000");
 	//root = trie_insert(root, "lev", "500");
 	//root = trie_insert(root, "bars", "70");
 	trie_print(root, 0);
 	//printf("Lookup 'bars': %s\n",trie_lookup(root, "bars"));
-	root = trie_delete(root, "bars");
+	root = trie_delete(root, "abcdef");
+	root = trie_delete(root, "abkjff");
+	root = trie_delete(root, "abcjff");
 	printf("Delete\n");
 	trie_print(root, 0);
 	return 0;
