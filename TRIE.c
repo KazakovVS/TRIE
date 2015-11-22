@@ -10,8 +10,39 @@ typedef struct Trie
 } Trie; 
 
 
+Trie *trieInsert(Trie *root, char *key); // функция вставки узла
+Trie *trieDelete(Trie *root, char *key); // удаление по ключу
+void triePrint(Trie *root); // печать дерева
+
+int main()
+{
+	 int i=0, k=0;
+	 Trie *root = NULL;
+	char arr[k][k],s;
+ 	FILE *ptrfile;
+ 	ptrfile=fopen( "mass.txt", "r");
+	while ((fscanf(ptrfile, "%c",&s)!=EOF))
+		{    if(!ptrfile) break;    //чтобы не делал лишнего
+        k+=1;
+		}
+
+	rewind(ptrfile);    //перематываем файл для повторного чтения
+ 	while (!feof(ptrfile)){
+        fscanf(ptrfile,"%s",arr[i]);
+        if (i=0){
+        	root = trieInsert(NULL, arr[i]);
+        }
+        else{
+			root = trieInsert(root, arr[i]);
+		}
+       i++;
+       }
+	fclose(ptrfile);
+	triePrint(root);
+}
+
 //Создает пустой узел
-Trie* trie_create()
+Trie* trieCreate()
 {
 	Trie* node;
 	if ( (node = malloc(sizeof(*node))) == NULL)
@@ -46,7 +77,7 @@ char *trie_lookup(Trie *root, char *key)
 }*/
 
 //Вставка узла в Trie
-Trie *trie_insert(Trie *root, char *key)
+Trie *trieInsert(Trie *root, char *key)
 {
 	Trie *node, *father, *list;
 	father = NULL;
@@ -60,7 +91,7 @@ Trie *trie_insert(Trie *root, char *key)
 		}
 		if (node == NULL) {
 	/* Не нашли узел, добавляем новый*/
-			node = trie_create();
+			node = trieCreate();
 			node->ch = *key;
 			node->count = 1;
 			node->subtrie = list;
@@ -79,7 +110,7 @@ Trie *trie_insert(Trie *root, char *key)
 		return root;
 } 
 
-Trie *node_delete(Trie *root, Trie *father, char *key, int *found)
+Trie *nodeDelete(Trie *root, Trie *father, char *key, int *found)
 {
 	Trie*node, *prev = NULL;
 	*found = (*key == '\0' && root == NULL) ? 1 : 0;
@@ -93,7 +124,7 @@ Trie *node_delete(Trie *root, Trie *father, char *key, int *found)
 	}
 	if (node == NULL)
 		return root;
-	node_delete(node->child, node, key + 1, found);
+	nodeDelete(node->child, node, key + 1, found);
 	if (*found > 0 && node->child == NULL) {
 	/* Удаляем узел */
 		if (prev != NULL)
@@ -109,10 +140,16 @@ Trie *node_delete(Trie *root, Trie *father, char *key, int *found)
 	return root;
 }
 
-Trie *trie_delete(Trie *root, char *key)
+Trie *trieDelete(Trie *root, char *key)
 {
 	int found;
-	return node_delete(root, NULL, key, &found);
+	return nodeDelete(root, NULL, key, &found);
+}
+
+void triePrint(Trie *root){
+
+	int level = 0;
+	return trie_print( root, level);
 }
 
 void trie_print(Trie *root, int level)
@@ -127,31 +164,4 @@ void trie_print(Trie *root, int level)
 		if (node->child != NULL)
 			trie_print(node->child, level + 1);
 	}
-}
-
-int main()
-{
-	 int i=0, k=0;
-	 Trie *root = NULL;
-	char arr[k][k],s;
- 	FILE *ptrfile;
- 	ptrfile=fopen( "mass.txt", "r");
-	while ((fscanf(ptrfile, "%c",&s)!=EOF))
-		{    if(!ptrfile) break;    //чтобы не делал лишнего
-        k+=1;
-		}
-
-	rewind(ptrfile);    //перематываем файл для повторного чтения
- 	while (!feof(ptrfile)){
-        fscanf(ptrfile,"%s",arr[i]);
-        if (i=0){
-        	root = trie_insert(NULL, arr[i]);
-        }
-        else{
-			root = trie_insert(root, arr[i]);
-		}
-       i++;
-       }
-	fclose(ptrfile);
-	trie_print(root, 0 );
 }
