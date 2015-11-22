@@ -133,7 +133,7 @@ int main()
 {
 	 int i=0, k=0;
 	 Trie *root = NULL;
-	char base[k][k],s;
+	char arr[k][k],s;
  	FILE *ptrfile;
  	ptrfile=fopen( "mass.txt", "r");
 	while ((fscanf(ptrfile, "%c",&s)!=EOF))
@@ -143,12 +143,12 @@ int main()
 
 	rewind(ptrfile);    //перематываем файл для повторного чтения
  	while (!feof(ptrfile)){
-        fscanf(ptrfile,"%s",base[i]);
+        fscanf(ptrfile,"%s",arr[i]);
         if (i=0){
-        	root = trie_insert(NULL, base[i]);
+        	root = trie_insert(NULL, arr[i]);
         }
         else{
-			root = trie_insert(root, base[i]);
+			root = trie_insert(root, arr[i]);
 		}
        i++;
        }
