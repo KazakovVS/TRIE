@@ -3,25 +3,25 @@
 
 typedef struct Trie 
 { 
-	//char *value;
 	char ch;
 	int  count;
-	struct trie *sibling; /* Sibling node */
+	struct trie *subtrie; /* subtrie node */
 	struct trie *child; /* First child node */
 } Trie; 
 
 
-//Создает пустой узел Trie
+//Создает пустой узел
 Trie* trie_create()
 {
 	Trie* node;
 	if ( (node = malloc(sizeof(*node))) == NULL)
 		return NULL;
+
 	node->ch = '\0';
-	//node->value = NULL;
 	node->count = 0;
-	node->sibling = NULL;
+	node->subtrie = NULL;
 	node->child = NULL;
+
 	return node;
 }
 
@@ -31,7 +31,7 @@ char *trie_lookup(Trie *root, char *key)
 {
 	Trie *node, *list;
 	for (list = root; *key != '\0'; key++) {
-		for (node = list; node != NULL; node = node->sibling)
+		for (node = list; node != NULL; node = node->subtrie)
 		{
 			if (node->ch == *key)
 			break;
@@ -48,44 +48,44 @@ char *trie_lookup(Trie *root, char *key)
 //Вставка узла в Trie
 Trie *trie_insert(Trie *root, char *key)
 {
-	Trie *node, *parent, *list;
-	parent = NULL;
+	Trie *node, *father, *list;
+	father = NULL;
 	list = root;
 	for (; *key != '\0'; key++) {
-	/* Lookup sibling node */
-		for (node = list; node != NULL; node = node->sibling)
+	/* Ищем узел subtrie */
+		for (node = list; node != NULL; node = node->subtrie)
 		{	
 			if (node->ch == *key)
 				break;
 		}
 		if (node == NULL) {
-	/* Node not found. Add new node */
+	/* Не нашли узел, добавляем новый*/
 			node = trie_create();
 			node->ch = *key;
 			node->count = 1;
-			node->sibling = list;
-			if (parent != NULL)
-				parent->child = node;
+			node->subtrie = list;
+			if (father != NULL)
+				father->child = node;
 			else
 				root = node;
 				list = NULL;
 		} else {
-	/* Node found. Move to next level */
+	/* Нашли узел. Переходим на следующий уровень.*/
 			node->count++;
 			list = node->child;
 		}
-		parent = node;
+		father = node;
 	}
 		return root;
 } 
 
-Trie *trie_delete_dfs(Trie *root, Trie *parent, char *key, int *found)
+Trie *node_delete(Trie *root, Trie *father, char *key, int *found)
 {
 	Trie*node, *prev = NULL;
 	*found = (*key == '\0' && root == NULL) ? 1 : 0;
 	if (root == NULL || *key == '\0')
 		return root;
-	for (node = root; node != NULL;node = node->sibling)
+	for (node = root; node != NULL;node = node->subtrie)
 	{
 		if (node->ch == *key)
 			break;
@@ -93,16 +93,16 @@ Trie *trie_delete_dfs(Trie *root, Trie *parent, char *key, int *found)
 	}
 	if (node == NULL)
 		return root;
-	trie_delete_dfs(node->child, node, key + 1, found);
+	node_delete(node->child, node, key + 1, found);
 	if (*found > 0 && node->child == NULL) {
-	/* Delete node */
+	/* Удаляем узел */
 		if (prev != NULL)
-			prev->sibling = node->sibling;
+			prev->subtrie = node->subtrie;
 		else {
-			if (parent != NULL)
-				parent->child = node->sibling;
+			if (father != NULL)
+				father->child = node->subtrie;
 			else
-				root = node->sibling;
+				root = node->subtrie;
 		}
 		free(node);
 	}
@@ -112,14 +112,14 @@ Trie *trie_delete_dfs(Trie *root, Trie *parent, char *key, int *found)
 Trie *trie_delete(Trie *root, char *key)
 {
 	int found;
-	return trie_delete_dfs(root, NULL, key, &found);
+	return node_delete(root, NULL, key, &found);
 }
 
 void trie_print(Trie *root, int level)
 {
-	Trie *node;
+	Trie *node = root;
 	int i;
-	for (node = root; node != NULL; node = node->sibling)
+	for (; node != NULL; node = node->subtrie)
 	{
 		for (i = 0; i < level; i++)
 			printf(" ");
@@ -127,21 +127,6 @@ void trie_print(Trie *root, int level)
 		if (node->child != NULL)
 			trie_print(node->child, level + 1);
 	}
-}
-
-int calcArr(){
-	FILE *ptrfile;
-	int i=0;
-	char s;
-	ptrfile=fopen( "mass.txt", "r");
-	while ((fscanf(ptrfile, "%c",&s)!=EOF))
-		{    
-		if(!ptrfile) 
-			break;    //чтобы не делал лишнего
-       		i++;
-		}
-	fclose(ptrfile);
-	return i;
 }
 
 int main()
@@ -167,6 +152,6 @@ int main()
 		}
        i++;
        }
-fclose(ptrfile);
-trie_print(root, 0 );
+	fclose(ptrfile);
+	trie_print(root, 0 );
 }
