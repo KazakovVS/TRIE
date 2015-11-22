@@ -13,6 +13,7 @@ typedef struct Trie
 Trie *trieInsert(Trie *root, char *key); // функция вставки узла
 Trie *trieDelete(Trie *root, char *key); // удаление по ключу
 void triePrint(Trie *root); // печать дерева
+Trie *Destroy(Trie *root);
 
 int main()
 {
@@ -39,6 +40,8 @@ int main()
        }
 	fclose(ptrfile);
 	triePrint(root);
+	Destroy(root);
+	//triePrint(root);
 }
 
 //Создает пустой узел
@@ -138,6 +141,43 @@ Trie *nodeDelete(Trie *root, Trie *father, char *key, int *found)
 		free(node);
 	}
 	return root;
+}
+
+Trie *trieDestroy(Trie *root, Trie *father){
+	Trie *node, *prev = NULL;
+
+	if (root == NULL)
+		return root;
+	for (node = root; node != NULL;node = node->subtrie)
+	{
+		//printf("%x\n", node->subtrie);
+		//printf("%c\n", node->ch);
+		if (node->child != NULL)
+			break;
+		prev = node;
+	}
+	if (node == NULL)
+	return root;
+		//printf("child %c\n", node->ch);
+	trieDestroy(node->child, node);
+	if (node->child == NULL) {
+	/* Удаляем узел */
+		//printf("child %c\n", node->ch);
+		if (prev != NULL)
+			prev->subtrie = node->subtrie;
+		else {
+			if (father != NULL)
+				father->child = node->subtrie;
+			else
+				root = node->subtrie;
+		}
+		free(node);
+	}
+	return root;
+}
+
+Trie *Destroy(Trie *root){
+	return trieDestroy(root, NULL);
 }
 
 Trie *trieDelete(Trie *root, char *key)
