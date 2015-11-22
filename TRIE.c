@@ -55,9 +55,6 @@ Trie *trie_insert(Trie *root, char *key)
 	/* Lookup sibling node */
 		for (node = list; node != NULL; node = node->sibling)
 		{	
-			if (node->ch == 'c')
-				printf("%c %s\n", node->ch, key);
-			node->count++;
 			if (node->ch == *key)
 				break;
 		}
@@ -74,16 +71,11 @@ Trie *trie_insert(Trie *root, char *key)
 				list = NULL;
 		} else {
 	/* Node found. Move to next level */
+			node->count++;
 			list = node->child;
 		}
 		parent = node;
 	}
-
-	/* Update value in leaf */
-	/*
-	if (node->value != NULL)
-		free(node->value);
-		node->value = strdup(value);*/
 		return root;
 } 
 
@@ -112,7 +104,6 @@ Trie *trie_delete_dfs(Trie *root, Trie *parent, char *key, int *found)
 			else
 				root = node->sibling;
 		}
-	//	free(node->value);
 		free(node);
 	}
 	return root;
@@ -132,34 +123,50 @@ void trie_print(Trie *root, int level)
 	{
 		for (i = 0; i < level; i++)
 			printf(" ");
-		/*if (node->value != NULL)
-			printf("%c %d \n", node->ch, node->count);
-		else*/
 			printf("%c %d \n", node->ch, node->count);
 		if (node->child != NULL)
 			trie_print(node->child, level + 1);
 	}
 }
 
+int calcArr(){
+	FILE *ptrfile;
+	int i=0;
+	char s;
+	ptrfile=fopen( "mass.txt", "r");
+	while ((fscanf(ptrfile, "%c",&s)!=EOF))
+		{    
+		if(!ptrfile) 
+			break;    //чтобы не делал лишнего
+       		i++;
+		}
+	fclose(ptrfile);
+	return i;
+}
 
 int main()
 {
-	Trie *root = NULL;
-	root = trie_insert(NULL, "abcdef");
-	root = trie_insert(root, "abcjff");
-	root = trie_insert(root, "abkjff");
-	root = trie_insert(root, "abkjff");
-	//root = trie_insert(root, "abcdm", "3");
-	//root = trie_insert(root, "baribal", "100");
-	//root = trie_insert(root, "kit", "3000");
-	//root = trie_insert(root, "lev", "500");
-	//root = trie_insert(root, "bars", "70");
-	trie_print(root, 0);
-	//printf("Lookup 'bars': %s\n",trie_lookup(root, "bars"));
-	root = trie_delete(root, "abcdef");
-	root = trie_delete(root, "abkjff");
-	root = trie_delete(root, "abcjff");
-	printf("Delete\n");
-	trie_print(root, 0);
-	return 0;
+	 int i=0, k=0;
+	 Trie *root = NULL;
+	char base[k][k],s;
+ 	FILE *ptrfile;
+ 	ptrfile=fopen( "mass.txt", "r");
+	while ((fscanf(ptrfile, "%c",&s)!=EOF))
+		{    if(!ptrfile) break;    //чтобы не делал лишнего
+        k+=1;
+		}
+
+	rewind(ptrfile);    //перематываем файл для повторного чтения
+ 	while (!feof(ptrfile)){
+        fscanf(ptrfile,"%s",base[i]);
+        if (i=0){
+        	root = trie_insert(NULL, base[i]);
+        }
+        else{
+			root = trie_insert(root, base[i]);
+		}
+       i++;
+       }
+fclose(ptrfile);
+trie_print(root, 0 );
 }

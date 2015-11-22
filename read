@@ -1,0 +1,24 @@
+int main()
+{
+    int k, i, s;
+	FILE *ptrfile;
+	k=0;
+    ptrfile=fopen("mass.txt","r"); //так мне было короче )
+ 
+	while ((fscanf(ptrfile, "%d",&s)!=EOF))
+		{    
+			if(!ptrfile) break;    //чтобы не делал лишнего
+        	k+=1;
+		}
+	int *c = (int*) malloc(k*sizeof(int));  //должен быть динамическим
+ 
+	rewind(ptrfile);    //перематываем файл для повторного чтения
+	for(i=0;i<k;i++)
+		{
+   			fscanf(ptrfile, "%d",&c[i]);
+    		printf("c[%d]=%d  ",i,c[i]);
+		}
+		fclose(ptrfile);
+		free(c); //убираем мусор, когда уже не нужен (но не раньше =))
+		return 0;
+}
