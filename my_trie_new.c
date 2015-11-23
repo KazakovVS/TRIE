@@ -166,45 +166,46 @@ void TrieDestroy( Trie* root )
  Trie *node = root;
  Trie *tmp = NULL;
  
-    while(node)
+  while(node)
  {
-  while(node->children)
-   node = node->children;
- 
-  if( node->prev && node->next)
-  {
-   tmp = node;
-   node->next->prev = node->prev;
-   node->prev->next = node->next;
-   free(tmp);
-  }
-  else if(node->prev && !(node->next))
-  {
-   tmp = node;
-   node->prev->next = NULL;
-   free(tmp);
-  }
-  else if(!(node->prev) && node->next)
-  {
-   tmp = node;
-   node->parent->children = node->next;
-   node->next->prev = NULL;
-   node = node->next;
-   free(tmp);
-  }
-  else
-  {
-   tmp = node;
-   if(node->parent == NULL)
-   {
-    /*Root*/
-    free(tmp);
-    return;
-   }
-   node = node->parent;
-   node->children = NULL;
-   free(tmp);
-  }
+    while(node->children)
+    {
+        node = node->children;
+    } 
+    if( node->prev && node->next)
+    {
+        tmp = node;
+        node->next->prev = node->prev;
+        node->prev->next = node->next;
+        free(tmp);
+    }
+    else if(node->prev && !(node->next))
+    {
+        tmp = node;
+        node->prev->next = NULL;
+        free(tmp);
+    }
+    else if(!(node->prev) && node->next)
+    {
+        tmp = node;
+        node->parent->children = node->next;
+        node->next->prev = NULL;
+        node = node->next;
+        free(tmp);
+    }
+    else
+    {
+        tmp = node;
+        if(node->parent == NULL)
+        {
+            /*Root*/
+            free(tmp);
+            return;
+         }
+        node = node->parent;
+        node->children = NULL;
+        free(tmp);
+    }
  }
  
 }
